@@ -1,5 +1,6 @@
 <template>
   <div class="layout">
+    <PlayList />
     <div class="layout__main">
       <div class="layout__sidebar">
         <SideBar />
@@ -9,15 +10,16 @@
       </div>
     </div>
     <div class="layout__footer">
-      <PlayerBar />
+      <FooterBar />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import SideBar from "./components/SideBar.vue";
-import PlayerBar from "./components/PlayerBar.vue";
+import FooterBar from "./components/FooterBar.vue";
 import SongList from "./components/SongList.vue";
+import PlayList from "./components/PlayList.vue";
 </script>
 
 <style lang="scss">

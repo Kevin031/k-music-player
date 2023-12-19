@@ -1,9 +1,18 @@
 <template>
   <div class="song-info">
-    <img class="song-info__poster" />
+    <img
+      class="song-info__poster"
+      :src="playerStore.songInfo.poster"
+      v-if="playerStore.songInfo.poster"
+    />
+    <div v-else class="song-info__poster" />
     <div class="song-info__content">
-      <div class="song-info__name">No one knows</div>
-      <div class="song-info__desc">Queens of the Stone Age</div>
+      <div class="song-info__name">
+        {{ playerStore.songInfo.title || "暂无歌曲" }}
+      </div>
+      <div class="song-info__desc">
+        {{ playerStore.songInfo.artist || "未知歌手" }}
+      </div>
     </div>
     <div class="song-info__actions">
       <div class="action">
@@ -12,12 +21,29 @@
       <div class="action">
         <Icon :size="16" name="add" />
       </div>
-      <div class="action">
+      <div
+        class="action"
+        @click="
+          controllerStore.setControllerVisible(
+            'playList',
+            !controllerStore.getControllerVisible('playList')
+          )
+        "
+      >
         <Icon :size="16" name="list" />
       </div>
     </div>
   </div>
 </template>
+
+<script setup lang="ts">
+import { usePlayerStore } from "../stores/player";
+import { useControllerStore } from "../stores/controller";
+import Icon from "./Icon.vue";
+
+const playerStore = usePlayerStore();
+const controllerStore = useControllerStore();
+</script>
 
 <style lang="scss">
 @import "../styles/variables.scss";
@@ -25,6 +51,7 @@
 .song-info {
   display: flex;
   align-items: center;
+  width: 242px;
   &__poster {
     width: 48px;
     height: 48px;

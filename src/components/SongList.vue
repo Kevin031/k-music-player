@@ -1,5 +1,18 @@
 <template>
   <div class="song-list-wrapper">
+    <div class="song-list-controller">
+      <div class="controller-l">
+        <div class="action" @click="playAllList">
+          <Icon :size="54" name="play-action" />
+        </div>
+      </div>
+      <div class="controller-r">
+        <div class="search-input">
+          <Icon class="search-icon" :size="16" name="Search" />
+          <input placeholder="输入关键词搜索" />
+        </div>
+      </div>
+    </div>
     <div class="song-list-table">
       <div class="list-head">
         <div>TITLE</div>
@@ -13,14 +26,14 @@
         <div class="num">
           {{ idx + 1 }}
         </div>
-        <div class="play-btn">
+        <div class="play-btn" @click="handlePlay(item)">
           <Icon :size="16" name="play-action" />
         </div>
         <div class="song-info">
-          <img class="poster" />
+          <img class="poster" :src="item.poster" />
           <div class="content">
             <div class="name">
-              {{ item.name }}
+              {{ item.title }}
             </div>
             <div class="artist">
               {{ item.artist }}
@@ -38,15 +51,51 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Icon from "./Icon.vue";
+import { usePlayerStore } from "../stores/player";
+import { usePlayListStore } from "../stores/play-list";
+import { ISong } from "../types/song";
 
-const songList = ref(
-  Array(100).fill({
-    name: "歌曲名称",
-    album: "专辑",
-    artist: "演唱者",
-    time: "3:29",
-  })
-);
+const playerStore = usePlayerStore();
+const playListStore = usePlayListStore();
+
+const songList = ref([
+  {
+    title: "摩天动物园",
+    album: "摩天动物园",
+    artist: "G.E.M.邓紫棋",
+    time: 200,
+    src: "/public/local-music/摩天动物园.mp3",
+    poster: "/public/local-music/poster.jpeg",
+  },
+  {
+    title: "句号",
+    album: "摩天动物园",
+    artist: "G.E.M.邓紫棋",
+    time: 200,
+    src: "/public/local-music/句号.mp3",
+    poster: "/public/local-music/poster.jpeg",
+  },
+]);
+
+const playAllList = () => {
+  for (let i = songList.value.length - 1; i >= 0; i--) {
+    let song = songList.value[i];
+    playListStore.addToList(song);
+  }
+  handlePlay(playListStore.playList[0]);
+};
+
+const handlePlay = (song: ISong) => {
+  // 添加到播放列表
+  playListStore.addToList(song);
+  playerStore.updateSongInfo({
+    title: song.title,
+    poster: song.poster,
+    artist: song.artist,
+    album: song.album,
+    src: song.src,
+  });
+};
 </script>
 
 <style lang="scss">
@@ -54,6 +103,47 @@ const songList = ref(
 
 .song-list-wrapper {
   padding: 22px 48px;
+}
+.song-list-controller {
+  padding-left: 32px;
+  margin-bottom: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .action {
+    cursor: pointer;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+  .search-input {
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: 16px;
+    overflow: hidden;
+    box-sizing: border-box;
+    position: relative;
+    .search-icon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      left: 16px;
+    }
+    input {
+      background: transparent;
+      border: none;
+      height: 32px;
+      padding: 0 16px 0 48px;
+      width: 200px;
+      font-size: 10px;
+      color: #fff;
+      &:focus {
+        outline: none;
+      }
+      &::-webkit-input-placeholder {
+        color: $color-neutral-1;
+      }
+    }
+  }
 }
 .song-list-table {
   width: 100%;
@@ -72,6 +162,8 @@ const songList = ref(
       font-size: 10px;
       color: $color-neutral-1;
       line-height: 16px;
+      box-sizing: border-box;
+      padding: 0 8px;
     }
   }
 
